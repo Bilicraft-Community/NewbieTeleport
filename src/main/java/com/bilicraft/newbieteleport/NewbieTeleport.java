@@ -1,5 +1,7 @@
 package com.bilicraft.newbieteleport;
 
+import me.SuperRonanCraft.BetterRTP.BetterRTP;
+import me.SuperRonanCraft.BetterRTP.player.rtp.RTP_TYPE;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -25,17 +27,18 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
     public void onDisable() {
         // Plugin shutdown logic
     }
+
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void respawnSafe(PlayerRespawnEvent event){
-        if(!event.getRespawnLocation().clone().add(0,-1,0).getBlock().getType().isSolid()){
-            event.getRespawnLocation().clone().add(0,-1,0).getBlock().setType(Material.GLASS);
+    public void respawnSafe(PlayerRespawnEvent event) {
+        if (!event.getRespawnLocation().clone().add(0, -1, 0).getBlock().getType().isSolid()) {
+            event.getRespawnLocation().clone().add(0, -1, 0).getBlock().setType(Material.GLASS);
         }
     }
 
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
     public void teleportNewbie(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLater(this,()->{
+        Bukkit.getScheduler().runTaskLater(this, () -> {
             if (!event.getPlayer().hasPlayedBefore()) {
                 if (getConfig().getLocation("location") != null) {
                     event.getPlayer().teleport(getConfig().getLocation("location"));
@@ -43,8 +46,16 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
                 } else {
                     getLogger().warning("Teleport location not set!");
                 }
+            } else {
+                if (event.getPlayer().getWorld().getName().equals("exchange")) {
+                    if (event.getPlayer().getBedSpawnLocation() != null) {
+                        event.getPlayer().teleport(event.getPlayer().getBedLocation());
+                    } else {
+                        BetterRTP.getInstance().getCmd().tp(event.getPlayer(), Bukkit.getConsoleSender(), BetterRTP.getInstance().getSettings().rtpOnFirstJoin_World, null, RTP_TYPE.JOIN);
+                    }
+                }
             }
-        },1);
+        }, 1);
     }
 
     @Override
