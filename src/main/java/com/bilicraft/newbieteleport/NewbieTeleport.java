@@ -23,6 +23,8 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
         // Plugin startup logic
         saveDefaultConfig();
         Bukkit.getPluginManager().registerEvents(this, this);
+        getLogger().info("Schedule the map pregen...");
+        Bukkit.getScheduler().runTaskLater(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iris pregen 8000 "+BetterRTP.getInstance().getSettings().rtpOnFirstJoin_World), 1L);
     }
 
     @Override
@@ -40,6 +42,7 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void teleportNewbie(PlayerJoinEvent event) {
+
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (!event.getPlayer().hasPlayedBefore()) {
                 if (getConfig().getLocation("location") != null) {
@@ -49,22 +52,23 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
                     getLogger().warning("Teleport location not set!");
                 }
             } else {
-                getLogger().info("Logged in at: "+event.getPlayer().getLocation());
+                getLogger().info("Logged in at: " + event.getPlayer().getLocation());
                 if (event.getPlayer().getLocation().getWorld().getName().equals("exchange")) {
-                    event.getPlayer().sendMessage(ChatColor.YELLOW+"正在重新启动传送，请稍后...");
-                    getLogger().info("为玩家 "+event.getPlayer().getName()+" 重新启动传送...");
-                    Location bedLocation = event.getPlayer().getBedLocation();
-                    if (event.getPlayer().getBedSpawnLocation() != null) {
-                        getLogger().info("传送："+event.getPlayer().getName()+" 到 "+event.getPlayer().getBedSpawnLocation());
-                        event.getPlayer().teleportAsync(bedLocation).thenAccept((a)->{
-                            if(a){
-                                getLogger().info("传送："+event.getPlayer().getName()+" 到 "+bedLocation+" 成功");
-                            }else{
-                                getLogger().info("传送："+event.getPlayer().getName()+" 到 "+bedLocation+" 失败");
+                    event.getPlayer().sendMessage(ChatColor.YELLOW + "正在重新启动传送，请稍后...");
+                    getLogger().info("为玩家 " + event.getPlayer().getName() + " 重新启动传送...");
+                    Location bedLocation = event.getPlayer().getBedSpawnLocation();
+                    if (bedLocation != null) {
+                        getLogger().info("传送：" + event.getPlayer().getName() + " 到 " + bedLocation);
+                        event.getPlayer().teleportAsync(bedLocation).thenAccept((a) -> {
+                            if (a) {
+                                getLogger().info("传送：" + event.getPlayer().getName() + " 到 " + bedLocation + " 成功");
+                            } else {
+                                getLogger().info("传送：" + event.getPlayer().getName() + " 到 " + bedLocation + " 失败");
                             }
                         });
                     } else {
-                        getLogger().info("传送："+event.getPlayer().getName()+" 到 Random");
+                        getLogger().info("传送：" + event.getPlayer().getName() + " 到 Random");
+                        event.getPlayer().sendMessage(ChatColor.YELLOW + "请稍等，我们正在为你寻找合适的位置进行传送，请允许最多60秒...");
                         BetterRTP.getInstance().getCmd().tp(event.getPlayer(), Bukkit.getConsoleSender(), BetterRTP.getInstance().getSettings().rtpOnFirstJoin_World, null, RTP_TYPE.JOIN);
                     }
                 }

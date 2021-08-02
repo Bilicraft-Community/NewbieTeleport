@@ -2,6 +2,8 @@ name: NewbieTeleport
 version: ${project.version}
 main: com.bilicraft.newbieteleport.NewbieTeleport
 api-version: 1.17
+softdepend:
+  - BetterRTP
 commands:
   setupntp:
     description: 设置传送点
