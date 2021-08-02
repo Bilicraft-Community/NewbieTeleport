@@ -3,6 +3,8 @@ package com.bilicraft.newbieteleport;
 import me.SuperRonanCraft.BetterRTP.BetterRTP;
 import me.SuperRonanCraft.BetterRTP.player.rtp.RTP_TYPE;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -36,7 +38,7 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
     }
 
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void teleportNewbie(PlayerJoinEvent event) {
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (!event.getPlayer().hasPlayedBefore()) {
@@ -47,10 +49,22 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
                     getLogger().warning("Teleport location not set!");
                 }
             } else {
-                if (event.getPlayer().getWorld().getName().equals("exchange")) {
+                getLogger().info("Logged in at: "+event.getPlayer().getLocation());
+                if (event.getPlayer().getLocation().getWorld().getName().equals("exchange")) {
+                    event.getPlayer().sendMessage(ChatColor.YELLOW+"正在重新启动传送，请稍后...");
+                    getLogger().info("为玩家 "+event.getPlayer().getName()+" 重新启动传送...");
+                    Location bedLocation = event.getPlayer().getBedLocation();
                     if (event.getPlayer().getBedSpawnLocation() != null) {
-                        event.getPlayer().teleport(event.getPlayer().getBedLocation());
+                        getLogger().info("传送："+event.getPlayer().getName()+" 到 "+event.getPlayer().getBedSpawnLocation());
+                        event.getPlayer().teleportAsync(bedLocation).thenAccept((a)->{
+                            if(a){
+                                getLogger().info("传送："+event.getPlayer().getName()+" 到 "+bedLocation+" 成功");
+                            }else{
+                                getLogger().info("传送："+event.getPlayer().getName()+" 到 "+bedLocation+" 失败");
+                            }
+                        });
                     } else {
+                        getLogger().info("传送："+event.getPlayer().getName()+" 到 Random");
                         BetterRTP.getInstance().getCmd().tp(event.getPlayer(), Bukkit.getConsoleSender(), BetterRTP.getInstance().getSettings().rtpOnFirstJoin_World, null, RTP_TYPE.JOIN);
                     }
                 }
