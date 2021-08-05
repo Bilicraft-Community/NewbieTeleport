@@ -24,7 +24,7 @@ public final class NewbieTeleport extends JavaPlugin implements Listener {
         saveDefaultConfig();
         Bukkit.getPluginManager().registerEvents(this, this);
         getLogger().info("Schedule the map pregen...");
-        Bukkit.getScheduler().runTaskLater(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iris pregen 8000 "+BetterRTP.getInstance().getSettings().rtpOnFirstJoin_World), 1L);
+        Bukkit.getScheduler().runTaskLater(this, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "iris pregen 6000 "+BetterRTP.getInstance().getSettings().rtpOnFirstJoin_World), 1L);
     }
 
     @Override
